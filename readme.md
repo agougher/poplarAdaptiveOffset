@@ -9,7 +9,7 @@ poplar (*Populus balsamifera* L.), a forest tree species. Link.
 
 In the data folder are several files:
 
-  - popInfo.csv: names and locations (long/latitudes) of 81 balsam
+  - popInfo.csv: names and locations (longitudes/latitudes) of 81 balsam
     poplar populations
   - fstTab.csv: pairwise *F<sub>ST</sub>* table for 81 populations
   - mafTab.csv: minor allele frequency (MAF) table for 75 SNPs for 81
