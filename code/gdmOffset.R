@@ -1,5 +1,8 @@
 require(raster)
 require(gdm)
+require(foreach)
+require(parallel)
+require(doParallel)
 
 #function to remove intercept from gdm predictions
 removeIntercept <- function(mod,pred){
@@ -11,10 +14,9 @@ removeIntercept <- function(mod,pred){
 ##############
 #Load and prep FST data
 ##############
-#Fst calculated in 'fstForFloweringTimeSNPs.R'
 adptMat <- read.csv("./data/fstTab.csv")
 
-#Read in population locations, and keeps populations that are in the Fst table
+#Read in population locations
 pops <- read.csv("./data/popInfo.csv")
 
 #make sure the two are in the same order
@@ -36,7 +38,6 @@ presClim <- presClim[[predNames]]
 pred <- data.frame(pop=pops$code,long=pops$long, lat=pops$lat, extract(presClim, y=pops[,c("long","lat")]),
                    stringsAsFactors=FALSE)
 
-
 ######################
 #GDM model
 ######################
@@ -46,12 +47,10 @@ sitePair <- formatsitepair(bioDat = adptMat, bioFormat=3, siteColumn="pop", XCol
 #Create and plot gdm
 mod <- gdm(na.omit(sitePair), geo=FALSE)
 
-
 #load future climate data
 futClims <- stack(...) #stack future climate layers
 futClims <- futClims[[predNames]]
 futClimDat <- as.data.frame(futClims, xy=TRUE, na.rm=TRUE)
-
 
 #Getting all coordinates in range map
 popDat <- na.omit(as.data.frame(mask(presClim, shp), xy=TRUE))
@@ -62,7 +61,7 @@ popDat <- split(popDat, seq(nrow(popDat)))
 ###############
 #Forward offset calculation
 ##############
-cl <- makeCluster(15) #ideally should be run in parallel to decrease computing time
+cl <- makeCluster(15) #ideally should be run in parallel to reduce computing time
 registerDoParallel(cl)
 forwardOffsetGDM <- foreach(i = 1:length(popDat), .packages=c("fields","gdm","geosphere")) %dopar%{
   
@@ -113,7 +112,7 @@ forwardOffsetGDM <- foreach(i = 1:length(popDat), .packages=c("fields","gdm","ge
   bear <- bearing(coord, minPt)
   
   #write out
-  out <- c(x1=coord[[1]], y1=coord[[2]],offset=offset,predFst=minVal, predDist=toGo, bearing=bear,x2=minPt[[1]],y2=minPt[[2]])
+  out <- c(x1=coord[[1]], y1=coord[[2]],local=offset,forwardFst=minVal, predDist=toGo, bearing=bear,x2=minPt[[1]],y2=minPt[[2]])
   
 }
 
@@ -121,8 +120,8 @@ stopCluster(cl)
 
 #in this resultant dataframe the columns are:
 #x1/y1: focal coordinates
-#offset: local offset
-#predFst: forward offset
+#local: local offset
+#forwardFst: forward offset
 #predDist: distance to site of forward offset
 #bearing: bearing to site of forward offset
 #x2/y2: coordinate of site of forward offset
@@ -145,7 +144,9 @@ futClimDat <- as.data.frame(futClimMask, xy=TRUE, na.rm=TRUE)
 #set up for prediction
 futClimDat <- data.frame(distance=1, weight=1, futClimDat)
 
-
+###############
+#Reverse offset calculation
+##############
 cl <- makeCluster(15)
 registerDoParallel(cl)
 reverseOffsetGDM <- foreach(i = 1:nrow(futClimDat), .packages=c("fields","gdm","geosphere")) %dopar%{
@@ -197,7 +198,7 @@ reverseOffsetGDM <- foreach(i = 1:nrow(futClimDat), .packages=c("fields","gdm","
   bear <- bearing(coord, minPt)
   
   #write out
-  out <- c(x1=coord[[1]], y1=coord[[2]],offset=offset,predFst=minVal, predDist=toGo, bearing=bear,x2=minPt[[1]],y2=minPt[[2]])
+  out <- c(x1=coord[[1]], y1=coord[[2]],local=offset,reverseFst=minVal, predDist=toGo, bearing=bear,x2=minPt[[1]],y2=minPt[[2]])
   
 }
 
@@ -205,8 +206,8 @@ stopCluster(cl)
 
 #in this resultant dataframe the columns are:
 #x1/y1: focal coordinates
-#offset: local offset - included as sanity check - should be identical to 'offset' from the calculation of forward offset above
-#predFst: reverse offset
+#local: local offset - included as sanity check - should be identical to 'offset' from the calculation of forward offset above
+#reverseFst: reverse offset
 #predDist: distance to site of reverse offset
 #bearing: bearing to site of reverse offset
 #x2/y2: coordinate of site of reverse offset
