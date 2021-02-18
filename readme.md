@@ -1,8 +1,9 @@
 Poplar adaptive offset
 ================
 
-Data and code for: Gougherty, A.V., Keller, S.R. and M.C. Fitzpatrick.
-Future climate change promotes novel genotype-climate associations in a forest tree species. Link.
+Data and code for: Gougherty, A.V., Keller, S.R. and M.C. Fitzpatrick. 2021. 
+Maladaptation, migration and extirpation fuel climate change risk in a forest 
+tree species. Nature Climate Change 11:166–171 [Link.](https://www.nature.com/articles/s41558-020-00968-6)
 
 ### Data
 
