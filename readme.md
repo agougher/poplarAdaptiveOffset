@@ -15,7 +15,7 @@ In the data folder are several files:
   - mafTab.csv: minor allele frequency (MAF) table for 75 SNPs for 81
     populations
 
-Genetic data is from [Keller et
+Genetic data are from [Keller et
 al. 2017](https://academic.oup.com/jhered/article/109/1/47/4605251),
 for a subset of SNPs in the flowering time gene network in balsam
 poplar. The *F<sub>ST</sub>* table is used to fit a generalized
