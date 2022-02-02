@@ -1,4 +1,5 @@
 require(raster)
+require(geosphere)
 require(gdm)
 require(foreach)
 require(parallel)
