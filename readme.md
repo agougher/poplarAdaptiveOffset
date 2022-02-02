@@ -22,6 +22,8 @@ poplar. The *F<sub>ST</sub>* table is used to fit a generalized
 dissimilarity model, and the MAF table is used in a Gradient Forest
 model.
 
+Climate data and the balsam poplar range file are available [here](https://drive.google.com/drive/folders/1NG-OPEmY9dmEWK_YoMCUF7YuFXJfOtvd?usp=sharing).
+
 ### Code
 
 The code is broken up into two scripts, one each for GDM and GF, as it
